@@ -1,5 +1,6 @@
 package com.frowhy.hold;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,12 +14,10 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Toast;
 
-import static android.os.PowerManager.SCREEN_BRIGHT_WAKE_LOCK;
 import static com.frowhy.hold.PpwButtonService.gFabContent;
 
-public class PopMaskService extends Service {
+public class PpwMaskService extends Service {
 
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mWindowParams;
@@ -45,13 +44,14 @@ public class PopMaskService extends Service {
         mWindowParams.height = WindowManager.LayoutParams.MATCH_PARENT;
     }
 
+    @SuppressLint("InflateParams")
     private void initView() {
         mReceiver = new HomeKeyEventBroadCastReceiver();
-        registerReceiver(mReceiver, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+        registerReceiver(mReceiver, new IntentFilter(Intent.ACTION_SCREEN_OFF));
 
         PowerManager powerManager = (PowerManager) this.getSystemService(Service.POWER_SERVICE);
         //noinspection deprecation
-        mWakeLock = powerManager.newWakeLock(SCREEN_BRIGHT_WAKE_LOCK, "My Lock");
+        mWakeLock = powerManager.newWakeLock(android.os.PowerManager.SCREEN_BRIGHT_WAKE_LOCK, "My Lock");
         mWakeLock.acquire();
         mWindowView = LayoutInflater.from(getApplication()).inflate(R.layout.ppw_mask, null);
     }
@@ -77,18 +77,12 @@ public class PopMaskService extends Service {
     }
 
     class HomeKeyEventBroadCastReceiver extends BroadcastReceiver {
-        static final String SYSTEM_REASON = "reason";
-
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action.equals(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)) {
-                String reason = intent.getStringExtra(SYSTEM_REASON);
-                if (reason != null && reason.equals("homekey")) {
-                    stopSelf();
-                    gFabContent.setButtonColor(getResources().getColor(R.color.colorAccent));
-                    Toast.makeText(context, "取消保持", Toast.LENGTH_SHORT).show();
-                }
+            if (action.equals(Intent.ACTION_SCREEN_OFF)) {
+                stopSelf();
+                gFabContent.setButtonColor(getResources().getColor(R.color.colorAccent));
             }
         }
     }

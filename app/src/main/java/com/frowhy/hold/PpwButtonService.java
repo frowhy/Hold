@@ -131,9 +131,9 @@ public class PpwButtonService extends Service {
     }
 
     private void onClick() {
-        Intent sPopMaskService = new Intent(getApplicationContext(), PopMaskService.class);
+        Intent sPopMaskService = new Intent(getApplicationContext(), PpwMaskService.class);
         startService(sPopMaskService);
-        Toast.makeText(PpwButtonService.this, "保持,取消请按Home键", Toast.LENGTH_SHORT).show();
+        Toast.makeText(PpwButtonService.this, "保持,取消请关屏", Toast.LENGTH_SHORT).show();
         gFabContent.setButtonColor(getResources().getColor(R.color.colorPrimary));
     }
 

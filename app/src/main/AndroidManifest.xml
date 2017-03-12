@@ -21,6 +21,6 @@
         </activity>
 
         <service android:name=".PpwButtonService" />
-        <service android:name=".PopMaskService" />
+        <service android:name=".PpwMaskService" />
     </application>
 </manifest>
