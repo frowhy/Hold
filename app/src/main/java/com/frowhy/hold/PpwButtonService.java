@@ -3,7 +3,9 @@ package com.frowhy.hold;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.PixelFormat;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.Nullable;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -14,6 +16,9 @@ import android.widget.Toast;
 
 import com.scalified.fab.FloatingActionButton;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 @SuppressWarnings("ALL")
 public class PpwButtonService extends Service {
 
@@ -21,7 +26,7 @@ public class PpwButtonService extends Service {
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mWindowParams;
     private View mWindowView;
-    private int mStartX, mStartY, mEndX, mEndY;
+    private int mStartX, mStartY;
     private boolean mIsTouch;
 
     @Override
@@ -29,8 +34,8 @@ public class PpwButtonService extends Service {
         super.onCreate();
         initWindowParams();
         initView();
-        addWindowView2Window();
         initClick();
+        addWindowView2Window();
     }
 
     private void initWindowParams() {
@@ -55,63 +60,87 @@ public class PpwButtonService extends Service {
 
     private void initClick() {
         gFabContent.setOnTouchListener(new View.OnTouchListener() {
+            private Timer timer;
+            private int mEndX;
+            private int mEndY;
+            private TimerTask mTask;
+            private int mCount = 0;
+            private boolean mIsDisplay;
+            Handler handler = new Handler() {
+                @Override
+                public void handleMessage(Message msg) {
+                    if (!mIsDisplay) {
+                        if (mCount > 5) {
+                            onLongClick();
+                            mIsDisplay = true;
+                        } else {
+                            mCount += 1;
+                        }
+                    }
+                    super.handleMessage(msg);
+                }
+            };
+
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        mStartX = (int) motionEvent.getRawX();
-                        mStartY = (int) motionEvent.getRawY();
+                        mStartX = mEndX = (int) motionEvent.getRawX();
+                        mStartY = mEndY = (int) motionEvent.getRawY();
+                        mCount = 0;
+                        mTask = new TimerTask() {
+                            @Override
+                            public void run() {
+                                Message message = new Message();
+                                handler.sendMessage(message);
+                            }
+                        };
+                        timer = new Timer();
+                        timer.schedule(mTask, 100, 100);
                         break;
-
                     case MotionEvent.ACTION_MOVE:
+                        int disX = (int) (motionEvent.getRawX() - mEndX);
+                        int disY = (int) (motionEvent.getRawY() - mEndY);
+                        mWindowParams.x += disX;
+                        mWindowParams.y += disY;
+                        mWindowManager.updateViewLayout(mWindowView, mWindowParams);
                         mEndX = (int) motionEvent.getRawX();
                         mEndY = (int) motionEvent.getRawY();
-                        if (needIntercept()) {
-                            mIsTouch = true;
-                            mWindowParams.x = (int) motionEvent.getRawX() - mWindowView.getMeasuredWidth() / 2;
-                            mWindowParams.y = (int) motionEvent.getRawY() - mWindowView.getMeasuredHeight() / 2;
-                            mWindowManager.updateViewLayout(mWindowView, mWindowParams);
-                            return true;
-                        }
+                        mIsDisplay = true;
                         break;
-
                     case MotionEvent.ACTION_UP:
-                        if (needIntercept()) {
-                            mIsTouch = false;
-                            return true;
+                        int x = (int) motionEvent.getRawX();
+                        int y = (int) motionEvent.getRawY();
+                        int upX = x - mStartX;
+                        int upY = y - mStartY;
+                        upX = Math.abs(upX);
+                        upY = Math.abs(upY);
+                        if (upX == 0 && upY == 0) {
+                            if (mCount <= 5) {
+                                onClick();
+                            }
                         }
-                        break;
-
-                    default:
+                        mIsDisplay = false;
+                        timer.cancel();
+                        timer.purge();
                         break;
                 }
-                return false;
-            }
-        });
-
-        gFabContent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent sPopMaskService = new Intent(getApplicationContext(), PopMaskService.class);
-                startService(sPopMaskService);
-                Toast.makeText(PpwButtonService.this, "保持,取消请按Home键", Toast.LENGTH_SHORT).show();
-                gFabContent.setButtonColor(getResources().getColor(R.color.colorPrimary));
-            }
-        });
-
-        gFabContent.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (!mIsTouch) {
-                    Toast.makeText(PpwButtonService.this, "单击保持", Toast.LENGTH_SHORT).show();
-                }
-                return false;
+                return true;
             }
         });
     }
 
-    private boolean needIntercept() {
-        return Math.abs(mStartX - mEndX) > 2 || Math.abs(mStartY - mEndY) > 2;
+    private void onClick() {
+        Intent sPopMaskService = new Intent(getApplicationContext(), PopMaskService.class);
+        startService(sPopMaskService);
+        Toast.makeText(PpwButtonService.this, "保持,取消请按Home键", Toast.LENGTH_SHORT).show();
+        gFabContent.setButtonColor(getResources().getColor(R.color.colorPrimary));
+    }
+
+    private void onLongClick() {
+        if (!mIsTouch) {
+            Toast.makeText(PpwButtonService.this, "单击保持", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
