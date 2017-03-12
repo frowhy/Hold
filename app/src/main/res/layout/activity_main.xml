@@ -4,12 +4,13 @@
     android:layout_height="match_parent">
 
     <Button
-        android:id="@+id/btn_open_pop_window"
+        android:id="@+id/btn_handle_popup_window"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="@string/open_pop_window" />
+        android:text="@string/open_popup_window"
+        android:theme="@style/BtnAccent" />
 
     <TextView
         android:id="@+id/textView"

@@ -10,33 +10,43 @@ import ezy.assist.compat.SettingsCompat;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Intent sPopButtonService;
+    private Intent mPpwButtonService;
+    private Button mBtnOpenPopupWindow;
+    private boolean mIsOpen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        sPopButtonService = new Intent(this, PopButtonService.class);
+        mPpwButtonService = new Intent(this, PpwButtonService.class);
 
-        Button mBtnOpenPopWindow = (Button) findViewById(R.id.btn_open_pop_window);
-        mBtnOpenPopWindow.setOnClickListener(new View.OnClickListener() {
+        mBtnOpenPopupWindow = (Button) findViewById(R.id.btn_handle_popup_window);
+        mBtnOpenPopupWindow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!SettingsCompat.canDrawOverlays(MainActivity.this)) {
                     if (!SettingsCompat.setDrawOverlays(MainActivity.this, true)) {
                         SettingsCompat.manageDrawOverlays(MainActivity.this);
                     } else {
-                        openPopWindow();
+                        handlePopupWindow();
                     }
                 } else {
-                    openPopWindow();
+                    handlePopupWindow();
                 }
             }
         });
     }
 
-    private void openPopWindow() {
-        startService(sPopButtonService);
+    private void handlePopupWindow() {
+        if (!mIsOpen) {
+            mIsOpen = true;
+            mBtnOpenPopupWindow.setText(R.string.close_popup_window);
+            startService(mPpwButtonService);
+        } else {
+            mIsOpen = false;
+            mBtnOpenPopupWindow.setText(R.string.open_popup_window);
+            stopService(mPpwButtonService);
+        }
     }
 }

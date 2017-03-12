@@ -6,12 +6,12 @@
     android:orientation="vertical">
 
     <com.scalified.fab.FloatingActionButton
-        android:id="@+id/fab_once"
+        android:id="@+id/fab_content"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
-        app:button_color="@color/colorPrimary"
-        app:button_colorPressed="@color/colorPrimary"
-        app:button_colorRipple="@color/colorPrimary"
+        app:button_color="@color/colorAccent"
+        app:button_colorPressed="@color/colorAccent"
+        app:button_colorRipple="@color/colorAccent"
         app:image="@drawable/fab_plus_icon" />
 </LinearLayout>

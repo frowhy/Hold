@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.PixelFormat;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -15,16 +14,14 @@ import android.widget.Toast;
 
 import com.scalified.fab.FloatingActionButton;
 
-public class PopButtonService extends Service {
+@SuppressWarnings("ALL")
+public class PpwButtonService extends Service {
 
-    public static FloatingActionButton mFabOnce;
+    public static FloatingActionButton gFabContent;
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mWindowParams;
     private View mWindowView;
-    private int mStartX;
-    private int mStartY;
-    private int mEndX;
-    private int mEndY;
+    private int mStartX, mStartY, mEndX, mEndY;
     private boolean mIsTouch;
 
     @Override
@@ -48,8 +45,8 @@ public class PopButtonService extends Service {
     }
 
     private void initView() {
-        mWindowView = LayoutInflater.from(getApplication()).inflate(R.layout.pop_button, null);
-        mFabOnce = (FloatingActionButton) mWindowView.findViewById(R.id.fab_once);
+        mWindowView = LayoutInflater.from(getApplication()).inflate(R.layout.ppw_button, null);
+        gFabContent = (FloatingActionButton) mWindowView.findViewById(R.id.fab_content);
     }
 
     private void addWindowView2Window() {
@@ -57,7 +54,7 @@ public class PopButtonService extends Service {
     }
 
     private void initClick() {
-        mFabOnce.setOnTouchListener(new View.OnTouchListener() {
+        gFabContent.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {
                 switch (motionEvent.getAction()) {
@@ -92,21 +89,21 @@ public class PopButtonService extends Service {
             }
         });
 
-        mFabOnce.setOnClickListener(new View.OnClickListener() {
+        gFabContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent sPopMaskService = new Intent(getApplicationContext(), PopMaskService.class);
                 startService(sPopMaskService);
-                Toast.makeText(PopButtonService.this, "保持,取消请按Home键", Toast.LENGTH_SHORT).show();
-                mFabOnce.setButtonColor(getResources().getColor(R.color.colorAccent));
+                Toast.makeText(PpwButtonService.this, "保持,取消请按Home键", Toast.LENGTH_SHORT).show();
+                gFabContent.setButtonColor(getResources().getColor(R.color.colorPrimary));
             }
         });
 
-        mFabOnce.setOnLongClickListener(new View.OnLongClickListener() {
+        gFabContent.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 if (!mIsTouch) {
-                    Toast.makeText(PopButtonService.this, "单击保持", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(PpwButtonService.this, "单击保持", Toast.LENGTH_SHORT).show();
                 }
                 return false;
             }

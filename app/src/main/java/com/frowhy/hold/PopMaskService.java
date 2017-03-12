@@ -9,7 +9,6 @@ import android.graphics.PixelFormat;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,15 +16,15 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 import static android.os.PowerManager.SCREEN_BRIGHT_WAKE_LOCK;
-import static com.frowhy.hold.PopButtonService.mFabOnce;
+import static com.frowhy.hold.PpwButtonService.gFabContent;
 
 public class PopMaskService extends Service {
 
     private WindowManager mWindowManager;
     private WindowManager.LayoutParams mWindowParams;
     private View mWindowView;
-    private HomeKeyEventBroadCastReceiver receiver;
-    private PowerManager.WakeLock wakeLock = null;
+    private HomeKeyEventBroadCastReceiver mReceiver;
+    private PowerManager.WakeLock mWakeLock = null;
 
     @Override
     public void onCreate() {
@@ -40,22 +39,21 @@ public class PopMaskService extends Service {
         mWindowParams = new WindowManager.LayoutParams();
         mWindowParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
         mWindowParams.format = PixelFormat.TRANSLUCENT;
-        mWindowParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
         mWindowParams.flags = WindowManager.LayoutParams.FLAG_FULLSCREEN;
-        mWindowParams.flags = WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         mWindowParams.gravity = Gravity.START | Gravity.TOP;
         mWindowParams.width = WindowManager.LayoutParams.MATCH_PARENT;
         mWindowParams.height = WindowManager.LayoutParams.MATCH_PARENT;
     }
 
     private void initView() {
-        receiver = new HomeKeyEventBroadCastReceiver();
-        registerReceiver(receiver, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
+        mReceiver = new HomeKeyEventBroadCastReceiver();
+        registerReceiver(mReceiver, new IntentFilter(Intent.ACTION_CLOSE_SYSTEM_DIALOGS));
 
         PowerManager powerManager = (PowerManager) this.getSystemService(Service.POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(SCREEN_BRIGHT_WAKE_LOCK, "My Lock");
-        wakeLock.acquire();
-        mWindowView = LayoutInflater.from(getApplication()).inflate(R.layout.pop_mask, null);
+        //noinspection deprecation
+        mWakeLock = powerManager.newWakeLock(SCREEN_BRIGHT_WAKE_LOCK, "My Lock");
+        mWakeLock.acquire();
+        mWindowView = LayoutInflater.from(getApplication()).inflate(R.layout.ppw_mask, null);
     }
 
     private void addWindowView2Window() {
@@ -65,8 +63,8 @@ public class PopMaskService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        wakeLock.release();
-        unregisterReceiver(receiver);
+        mWakeLock.release();
+        unregisterReceiver(mReceiver);
         if (mWindowView != null) {
             mWindowManager.removeView(mWindowView);
         }
@@ -88,7 +86,7 @@ public class PopMaskService extends Service {
                 String reason = intent.getStringExtra(SYSTEM_REASON);
                 if (reason != null && reason.equals("homekey")) {
                     stopSelf();
-                    mFabOnce.setButtonColor(getResources().getColor(R.color.colorPrimary));
+                    gFabContent.setButtonColor(getResources().getColor(R.color.colorAccent));
                     Toast.makeText(context, "取消保持", Toast.LENGTH_SHORT).show();
                 }
             }
