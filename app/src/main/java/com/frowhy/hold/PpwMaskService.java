@@ -82,6 +82,7 @@ public class PpwMaskService extends Service {
             String action = intent.getAction();
             if (action.equals(Intent.ACTION_SCREEN_OFF)) {
                 stopSelf();
+                gFabContent.setAlpha(1);
                 gFabContent.setButtonColor(getResources().getColor(R.color.colorAccent));
             }
         }

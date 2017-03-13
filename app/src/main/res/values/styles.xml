@@ -9,7 +9,7 @@
     </style>
 
     <style name="BtnAccent" parent="AppTheme">
-        <item name="buttonStyle">@style/Widget.AppCompat.Button</item>
+        <item name="buttonStyle">@style/Widget.AppCompat.Button.Small</item>
         <item name="colorButtonNormal">@color/colorAccent</item>
         <item name="android:textColor">@android:color/white</item>
     </style>
