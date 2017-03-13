@@ -41,9 +41,9 @@ public class PpwButtonService extends Service {
     private void initWindowParams() {
         mWindowManager = (WindowManager) getApplication().getSystemService(WINDOW_SERVICE);
         mWindowParams = new WindowManager.LayoutParams();
-        mWindowParams.type = WindowManager.LayoutParams.TYPE_PHONE;
+        mWindowParams.type = WindowManager.LayoutParams.TYPE_SYSTEM_ERROR;
         mWindowParams.format = PixelFormat.TRANSLUCENT;
-        mWindowParams.flags = WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        mWindowParams.flags = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
         mWindowParams.gravity = Gravity.START | Gravity.TOP;
         mWindowParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
         mWindowParams.height = WindowManager.LayoutParams.WRAP_CONTENT;
