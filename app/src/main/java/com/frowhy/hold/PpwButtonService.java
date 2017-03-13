@@ -45,8 +45,7 @@ public class PpwButtonService extends Service {
         mWindowParams.format = PixelFormat.TRANSLUCENT;
         mWindowParams.flags = WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
                 WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL |
-                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE |
-                WindowManager.LayoutParams.FLAG_ALT_FOCUSABLE_IM;
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
 
         mWindowParams.gravity = Gravity.START | Gravity.TOP;
         mWindowParams.width = WindowManager.LayoutParams.WRAP_CONTENT;
